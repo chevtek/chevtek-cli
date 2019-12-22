@@ -1,0 +1,32 @@
+{
+  "name": "@chevtek/cli",
+  "version": "1.0.0",
+  "description": "",
+  "bin": {
+    "@chevtek/cli": "bin/index.js",
+    "chevtek": "bin/index.js"
+  },
+  "scripts": {
+    "dev": "npm run build && npm link",
+    "build": "npm run clean && tsc",
+    "clean": "rm -rf ./bin"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chevtek/chevtek-cli.git"
+  },
+  "author": "Chev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chevtek/chevtek-cli/issues"
+  },
+  "homepage": "https://github.com/chevtek/chevtek-cli#readme",
+  "dependencies": {
+    "yargs": "^15.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^12.12.21",
+    "@types/yargs": "^13.0.3",
+    "typescript": "^3.7.4"
+  }
+}
