@@ -1,12 +1,7 @@
-import { exec } from "child_process";
+import chalk from "chalk";
+import { spawn } from "child_process";
 
-export default () => {
-  console.log("Generator running...");
-  exec('echo "hi"', (error: any, stdout: any, stderr: any) => {
-    stdout.pipe(process.stdout);
-    stderr.pipe(process.stderr);
-    if (error !== null) {
-      console.log(`exec error: ${error}`);
-    }
-  });
+export default (workingDir: string) => {
+  console.log(chalk.green("Generating full-stack scaffold..."));
+  console.log(chalk.green("Done!"));
 };
