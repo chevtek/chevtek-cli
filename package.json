@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/chevtek/chevtek-cli#readme",
   "dependencies": {
+    "chalk": "^3.0.0",
     "yargs": "^15.0.2"
   },
   "devDependencies": {

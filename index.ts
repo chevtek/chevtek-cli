@@ -1,12 +1,13 @@
 #!/usr/bin/env node
+import chalk from "chalk";
 import yargs from "yargs";
 import generators from "./generators";
 
 yargs
-  .scriptName("chevtek")
+  .scriptName(chalk.green("chevtek"))
   .usage("$0 <cmd> [args]")
   .command(
-    "generate [template]",
+    chalk.cyan("generate [template]"),
     "create new project scaffold from a given template",
     (yargs) =>
       yargs.positional("template", {
