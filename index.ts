@@ -3,6 +3,9 @@ import chalk from "chalk";
 import yargs from "yargs";
 import path from "path";
 import generators from "./generators";
+import Logger from "./logger";
+
+const { log } = new Logger("cli");
 
 yargs
   .scriptName("chevtek")
@@ -22,8 +25,17 @@ yargs
         describe: chalk.yellow("The path to generate scaffold at.")
       });
     },
-    ({ template, path: dir }: { template: string; path: string }) => {
-      generators[template](path.resolve(dir));
+    async ({ template, path: dir }: { template: string; path: string }) => {
+      try {
+        log(`generate --template="${template}" ${dir}`);
+        if (generators.hasOwnProperty(template)) {
+          await generators[template](path.resolve(dir));
+        } else {
+          throw new Error(`No template "${template}" found named.`);
+        }
+      } catch (err) {
+        console.log(chalk.red(err.message));
+      }
     }
   )
   .help().argv;
