@@ -28,11 +28,11 @@ yargs
         describe: chalk.yellow("The path to generate scaffold at.")
       });
     },
-    async ({ template, path: dir }: { template: string; path: string }) => {
+    async ({ template, path: dir, force }: { template: string; path: string }) => {
       try {
         console.log(chalk.yellow(`generate --template="${template}" ${dir}`));
         if (generators.hasOwnProperty(template)) {
-          await generators[template](path.resolve(dir));
+          await generators[template](path.resolve(dir), force);
         } else {
           throw new Error(`No template "${template}" found named.`);
         }
