@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "npm run build && npm link",
     "build": "npm run clean && tsc",
-    "clean": "rm -rf ./bin",
+    "clean": "rimraf ./bin",
     "prepublish": "npm run build"
   },
   "repository": {
