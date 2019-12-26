@@ -60,9 +60,9 @@ async function createPackageJson(dir: string) {
       "dev:client": "wait-on tcp:3001 && cd ./client && npm start",
       "build":
         "run-s build:clean build:server && run-p build:client build:dependencies",
-      "build:server": "cd ./server && npm run build && mv ./build ../build",
+      "build:server": "cd ./server && npm run build && move-cli ./build ../build",
       "build:client":
-        "cd ./client && npm run build && mv ./build ../build/client",
+        "cd ./client && npm run build && move-cli ./build ../build/client",
       "build:dependencies": "cd ./build && npm install",
       "build:clean": "rimraf ./build"
     }
@@ -73,7 +73,7 @@ async function createPackageJson(dir: string) {
   );
   await spawn(
     "npm",
-    ["install", "-D", "npm-run-all", "wait-on", "rimraf"],
+    ["install", "-D", "npm-run-all", "wait-on", "rimraf", "move-cli"],
     dir
   );
   console.log(chalk.green(`Created root package.json file.`));
