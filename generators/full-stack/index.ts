@@ -5,9 +5,7 @@ import chalk from "chalk";
 import childProcess from "child_process";
 import prettier from "prettier";
 import rimraf from "rimraf";
-import Logger from "../../logger";
 
-const { log } = new Logger("generate:full-stack");
 const mkdir = util.promisify(fs.mkdir);
 const stat = util.promisify(fs.stat);
 const readdir = util.promisify(fs.readdir);
@@ -17,7 +15,7 @@ const unlink = util.promisify(fs.unlink);
 const rmdir = util.promisify(rimraf);
 const spawn = (command: string, args: string[], cwd?: string) =>
   new Promise((resolve, reject) => {
-    // command = /^win/.test(process.platform) ? command + ".cmd" : command;
+    command = /^win/.test(process.platform) ? command + ".cmd" : command;
     const cmd = childProcess.spawn(command, args, { cwd, stdio: "inherit" });
     cmd.on("error", reject);
     cmd.on("close", resolve);
@@ -27,16 +25,16 @@ const format = (source: string) =>
 
 export default async (dir: string) => {
   console.log(chalk.green("Generating full-stack scaffold..."));
-  log(`Checking if "${dir}" exists...`);
+  console.log(chalk.green(`Checking if "${dir}" exists...`));
   const dirExists = await checkDirectoryExists(dir);
   if (dirExists) {
-    log(`Directory exists. Checking for existing files...`);
+    console.log(chalk.green(`Directory exists. Checking for existing files...`));
     const files = await readdir(dir);
     if (files.length > 0) {
       throw new Error("Please ensure the target directory is empty.");
     }
   } else {
-    log(`Creating directory...`);
+    console.log(chalk.green(`Creating directory...`));
     await mkdir(dir);
   }
   await Promise.all([
@@ -78,7 +76,7 @@ async function createPackageJson(dir: string) {
     ["install", "-D", "npm-run-all", "wait-on", "rimraf"],
     dir
   );
-  log(`Created root package.json file.`);
+  console.log(chalk.green(`Created root package.json file.`));
 }
 
 async function createGitIgnore(dir: string) {
@@ -93,7 +91,7 @@ async function createGitIgnore(dir: string) {
       .map((line) => line.trim())
       .join("\n")
   );
-  log(`Created .gitignore.`);
+  console.log(chalk.green(`Created .gitignore.`));
 }
 
 async function generateServerScaffold(dir: string) {
@@ -195,17 +193,17 @@ async function generateServerScaffold(dir: string) {
 async function generateClientScaffold(dir: string) {
   const clientDir = path.join(dir, "client");
   await mkdir(path.join(dir, "client"));
-  log(`Created "client" directory.`);
+  console.log(chalk.green(`Created "client" directory.`));
   await spawn(
     "npx",
     ["create-react-app", "--template", "typescript", "."],
     clientDir
   );
-  log(`Created react app.`);
+  console.log(chalk.green(`Created react app.`));
   await rmdir(path.join(clientDir, ".git"));
-  log(`Removed .git folder from client.`);
+  console.log(chalk.green(`Removed .git folder from client.`));
   await unlink(path.join(clientDir, ".gitignore"));
-  log(`Removed .gitignore file from client.`);
+  console.log(chalk.green(`Removed .gitignore file from client.`));
   const packageData = JSON.parse(
     (await readFile(path.join(clientDir, "package.json"))).toString()
   );
@@ -215,7 +213,7 @@ async function generateClientScaffold(dir: string) {
     path.join(clientDir, "package.json"),
     JSON.stringify(packageData, null, 2)
   );
-  log(`Wrote homepage and proxy to package.json.`);
+  console.log(chalk.green(`Wrote homepage and proxy to package.json.`));
 }
 
 async function checkDirectoryExists(dir: string) {

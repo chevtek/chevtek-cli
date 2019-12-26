@@ -3,9 +3,6 @@ import chalk from "chalk";
 import yargs from "yargs";
 import path from "path";
 import generators from "./generators";
-import Logger from "./logger";
-
-const { log } = new Logger("cli");
 
 yargs
   .scriptName("chevtek")
@@ -27,14 +24,14 @@ yargs
     },
     async ({ template, path: dir }: { template: string; path: string }) => {
       try {
-        log(`generate --template="${template}" ${dir}`);
+        console.log(chalk.yellow(`generate --template="${template}" ${dir}`));
         if (generators.hasOwnProperty(template)) {
           await generators[template](path.resolve(dir));
         } else {
           throw new Error(`No template "${template}" found named.`);
         }
       } catch (err) {
-        console.log(chalk.red(err.stack));
+        console.log(chalk.redBright(err.stack));
       }
     }
   )
