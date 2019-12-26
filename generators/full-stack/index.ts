@@ -26,18 +26,16 @@ const npmCmd = /^win/.test(process.platform) ? "npm.cmd" : "npm";
 const npxCmd = /^win/.test(process.platform) ? "npx.cmd" : "npx";
 
 export default async (dir: string) => {
-  console.log(chalk.green("Generating full-stack scaffold..."));
-  console.log(chalk.green(`Checking if "${dir}" exists...`));
+  console.log(chalk.greenBright("Generating full-stack scaffold..."));
   const dirExists = await checkDirectoryExists(dir);
   if (dirExists) {
-    console.log(chalk.green(`Directory exists. Checking for existing files...`));
     const files = await readdir(dir);
     if (files.length > 0) {
-      throw new Error("Please ensure the target directory is empty.");
+      throw new Error("Target directory is not empty.");
     }
   } else {
-    console.log(chalk.green(`Creating directory...`));
     await mkdir(dir);
+    console.log(chalk.greenBright(`Created "${dir}" directory.`));
   }
   await Promise.all([
     createPackageJson(dir),
@@ -45,7 +43,7 @@ export default async (dir: string) => {
     generateClientScaffold(dir)
   ]);
   await initializeGit(dir);
-  console.log(chalk.green("Done!"));
+  console.log(chalk.greenBright("Done!"));
 };
 
 async function initializeGit(dir: string) {
@@ -60,11 +58,17 @@ async function initializeGit(dir: string) {
       .map((line) => line.trim())
       .join("\n")
   );
-  console.log(chalk.green(`Created .gitignore.`));
+  console.log(chalk.greenBright(`Created .gitignore.`));
   try {
+    const exitCode = await spawn("git", ["status"], dir);
+    if (exitCode !== 128) {
+      console.log(chalk.greenBright("Parent git repository found, skipping repo init."));
+      return;
+    }
     await spawn("git", ["init"], dir);
     await spawn("git", ["add", "."], dir);
-    await spawn("git", ["commit", "-m", `Initialized full-stack project."`], dir);
+    await spawn("git", ["commit", "-m", `"Initialized full-stack project."`], dir);
+    console.log(chalk.greenBright("Initialized Git repository."));
   } catch (err) {
     console.log(chalk.redBright(err.message));
   }
@@ -100,7 +104,7 @@ async function createPackageJson(dir: string) {
     ["install", "-D", "npm-run-all", "wait-on", "rimraf", "move-cli"],
     dir
   );
-  console.log(chalk.green(`Created root package.json file.`));
+  console.log(chalk.greenBright(`Created root package.json file.`));
 }
 
 async function generateServerScaffold(dir: string) {
@@ -202,27 +206,27 @@ async function generateServerScaffold(dir: string) {
 async function generateClientScaffold(dir: string) {
   const clientDir = path.join(dir, "client");
   await mkdir(path.join(dir, "client"));
-  console.log(chalk.green(`Created "client" directory.`));
+  console.log(chalk.greenBright(`Created "client" directory.`));
   await spawn(
     npxCmd,
     ["create-react-app", "--template", "typescript", "."],
     clientDir
   );
-  console.log(chalk.green(`Created react app.`));
-  await rmdir(path.join(clientDir, ".git"));
-  console.log(chalk.green(`Removed .git folder from client.`));
+  console.log(chalk.greenBright(`Created react app.`));
   await unlink(path.join(clientDir, ".gitignore"));
-  console.log(chalk.green(`Removed .gitignore file from client.`));
+  console.log(chalk.greenBright(`Removed .gitignore file from client.`));
   const packageData = JSON.parse(
     (await readFile(path.join(clientDir, "package.json"))).toString()
   );
+  await rmdir(path.join(clientDir, ".git"));
+  console.log(chalk.greenBright(`Removed .git folder from client.`));
   packageData.homepage = ".";
   packageData.proxy = "http://localhost:3001";
   await writeFile(
     path.join(clientDir, "package.json"),
     JSON.stringify(packageData, null, 2)
   );
-  console.log(chalk.green(`Wrote homepage and proxy to package.json.`));
+  console.log(chalk.greenBright(`Wrote homepage and proxy to package.json.`));
 }
 
 async function checkDirectoryExists(dir: string) {
