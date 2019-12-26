@@ -28,7 +28,7 @@ yargs
         describe: chalk.yellow("The path to generate scaffold at.")
       });
     },
-    async ({ template, path: dir, force }: { template: string; path: string }) => {
+    async ({ template, path: dir, force }: { template: string; path: string, force: boolean }) => {
       try {
         console.log(chalk.yellow(`generate --template="${template}" ${dir}`));
         if (generators.hasOwnProperty(template)) {
