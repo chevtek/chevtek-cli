@@ -34,7 +34,7 @@ yargs
           throw new Error(`No template "${template}" found named.`);
         }
       } catch (err) {
-        console.log(chalk.red(err.message));
+        console.log(chalk.red(err.stack));
       }
     }
   )
