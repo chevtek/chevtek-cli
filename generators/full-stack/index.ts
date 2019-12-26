@@ -17,6 +17,7 @@ const unlink = util.promisify(fs.unlink);
 const rmdir = util.promisify(rimraf);
 const spawn = (command: string, args: string[], cwd?: string) =>
   new Promise((resolve, reject) => {
+    command = /^win/.test(process.platform) ? command + ".cmd" : command;
     const cmd = childProcess.spawn(command, args, { cwd, stdio: "inherit" });
     cmd.on("error", reject);
     cmd.on("close", resolve);
