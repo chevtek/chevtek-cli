@@ -26,6 +26,7 @@
     "chalk": "^3.0.0",
     "debug": "^4.1.1",
     "prettier": "^1.19.1",
+    "rimraf": "^3.0.0",
     "yargs": "^15.0.2"
   },
   "devDependencies": {
@@ -34,7 +35,6 @@
     "@types/prettier": "^1.19.0",
     "@types/rimraf": "^2.0.3",
     "@types/yargs": "^13.0.3",
-    "rimraf": "^3.0.0",
     "typescript": "^3.7.4"
   }
 }
