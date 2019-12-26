@@ -1,6 +1,6 @@
 {
   "name": "@chevtek/cli",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "",
   "bin": {
     "@chevtek/cli": "bin/index.js",
