@@ -15,7 +15,12 @@ const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
 const unlink = util.promisify(fs.unlink);
 const rmdir = util.promisify(rimraf);
-const exec = util.promisify(childProcess.exec);
+const spawn = (command: string, args: string[], cwd?: string) =>
+  new Promise((resolve, reject) => {
+    const cmd = childProcess.spawn(command, args, { cwd, stdio: "inherit" });
+    cmd.on("error", reject);
+    cmd.on("close", resolve);
+  });
 const format = (source: string) =>
   prettier.format(source, { parser: "typescript" });
 
@@ -67,7 +72,11 @@ async function createPackageJson(dir: string) {
     path.join(dir, "package.json"),
     JSON.stringify(data, null, 2)
   );
-  await exec("npm install -D npm-run-all wait-on rimraf", { cwd: dir });
+  await spawn(
+    "npm",
+    ["install", "-D", "npm-run-all", "wait-on", "rimraf"],
+    dir
+  );
   log(`Created root package.json file.`);
 }
 
@@ -101,14 +110,24 @@ async function generateServerScaffold(dir: string) {
     path.join(serverDir, "package.json"),
     JSON.stringify(packageData, null, 2)
   );
-  await exec("npm install dotenv koa mongoose koa-static", {
-    cwd: serverDir
-  });
-  await exec(
-    "npm install -D typescript @types/node @types/koa @types/mongoose @types/koa-static ts-node-dev",
-    {
-      cwd: serverDir
-    }
+  await spawn(
+    "npm",
+    ["install", "dotenv", "koa", "mongoose", "koa-static"],
+    serverDir
+  );
+  await spawn(
+    "npm",
+    [
+      "install",
+      "-D",
+      "typescript",
+      "ts-node-dev",
+      "@types/node",
+      "@types/koa",
+      "@types/koa-static",
+      "@types/mongoose"
+    ],
+    serverDir
   );
   await Promise.all([
     writeFile(
@@ -176,9 +195,11 @@ async function generateClientScaffold(dir: string) {
   const clientDir = path.join(dir, "client");
   await mkdir(path.join(dir, "client"));
   log(`Created "client" directory.`);
-  await exec("npx create-react-app --template typescript .", {
-    cwd: clientDir
-  });
+  await spawn(
+    "npx",
+    ["create-react-app", "--template", "typescript", "."],
+    clientDir
+  );
   log(`Created react app.`);
   await rmdir(path.join(clientDir, ".git"));
   log(`Removed .git folder from client.`);
@@ -201,9 +222,6 @@ async function checkDirectoryExists(dir: string) {
     await stat(dir);
     return true;
   } catch (err) {
-    if (err.errno === 34) {
-      return false;
-    }
-    throw err;
+    return false;
   }
 }
