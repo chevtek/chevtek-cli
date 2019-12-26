@@ -25,13 +25,13 @@ const format = (source: string) =>
 const npmCmd = /^win/.test(process.platform) ? "npm.cmd" : "npm";
 const npxCmd = /^win/.test(process.platform) ? "npx.cmd" : "npx";
 
-export default async (dir: string) => {
+export default async (dir: string, force: boolean) => {
   console.log(chalk.greenBright("Generating full-stack scaffold..."));
   const dirExists = await checkDirectoryExists(dir);
   if (dirExists) {
     const files = await readdir(dir);
-    if (files.length > 0) {
-      throw new Error("Target directory is not empty.");
+    if (!force && (files.length > 1 || path.basename(files[0]) !== ".git")) {
+      throw new Error("Target directory is not empty. Supply --force to generate anyway.");
     }
   } else {
     await mkdir(dir);

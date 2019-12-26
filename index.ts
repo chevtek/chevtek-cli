@@ -17,6 +17,12 @@ yargs
         alias: "t",
         describe: chalk.yellow("The template to use.")
       });
+      yargs.option("force", {
+        type: "boolean",
+        default: false,
+        alias: "f",
+        description: chalk.redBright("Force template generation even if directory is not empty.")
+      });
       yargs.positional("path", {
         type: "string",
         describe: chalk.yellow("The path to generate scaffold at.")
