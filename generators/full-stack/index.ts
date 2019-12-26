@@ -30,7 +30,7 @@ export default async (dir: string, force: boolean) => {
   const dirExists = await checkDirectoryExists(dir);
   if (dirExists) {
     const files = await readdir(dir);
-    if (!force && (files.length > 1 || path.basename(files[0]) !== ".git")) {
+    if (!force && files.length > 0 && (files.length > 1 || path.basename(files[0]) !== ".git")) {
       throw new Error("Target directory is not empty. Supply --force to generate anyway.");
     }
   } else {
