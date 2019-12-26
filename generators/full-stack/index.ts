@@ -15,13 +15,15 @@ const unlink = util.promisify(fs.unlink);
 const rmdir = util.promisify(rimraf);
 const spawn = (command: string, args: string[], cwd?: string) =>
   new Promise((resolve, reject) => {
-    command = /^win/.test(process.platform) ? command + ".cmd" : command;
     const cmd = childProcess.spawn(command, args, { cwd, stdio: "inherit" });
     cmd.on("error", reject);
     cmd.on("close", resolve);
   });
 const format = (source: string) =>
   prettier.format(source, { parser: "typescript" });
+
+const npmCmd = /^win/.test(process.platform) ? "npm.cmd" : "npm";
+const npxCmd = /^win/.test(process.platform) ? "npx.cmd" : "npx";
 
 export default async (dir: string) => {
   console.log(chalk.green("Generating full-stack scaffold..."));
@@ -39,12 +41,34 @@ export default async (dir: string) => {
   }
   await Promise.all([
     createPackageJson(dir),
-    createGitIgnore(dir),
     generateServerScaffold(dir),
     generateClientScaffold(dir)
   ]);
+  await initializeGit(dir);
   console.log(chalk.green("Done!"));
 };
+
+async function initializeGit(dir: string) {
+  await writeFile(
+    path.join(dir, ".gitignore"),
+    `
+      node_modules
+      .vscode
+      build
+    `
+      .split("\n")
+      .map((line) => line.trim())
+      .join("\n")
+  );
+  console.log(chalk.green(`Created .gitignore.`));
+  try {
+    await spawn("git", ["init"], dir);
+    await spawn("git", ["add", "."], dir);
+    await spawn("git", ["commit", "-m", `Initialized full-stack project."`], dir);
+  } catch (err) {
+    console.log(chalk.redBright(err.message));
+  }
+}
 
 async function createPackageJson(dir: string) {
   const data = {
@@ -72,26 +96,11 @@ async function createPackageJson(dir: string) {
     JSON.stringify(data, null, 2)
   );
   await spawn(
-    "npm",
+    npmCmd,
     ["install", "-D", "npm-run-all", "wait-on", "rimraf", "move-cli"],
     dir
   );
   console.log(chalk.green(`Created root package.json file.`));
-}
-
-async function createGitIgnore(dir: string) {
-  await writeFile(
-    path.join(dir, ".gitignore"),
-    `
-      node_modules
-      .vscode
-      build
-    `
-      .split("\n")
-      .map((line) => line.trim())
-      .join("\n")
-  );
-  console.log(chalk.green(`Created .gitignore.`));
 }
 
 async function generateServerScaffold(dir: string) {
@@ -110,12 +119,12 @@ async function generateServerScaffold(dir: string) {
     JSON.stringify(packageData, null, 2)
   );
   await spawn(
-    "npm",
+    npmCmd,
     ["install", "dotenv", "koa", "mongoose", "koa-static"],
     serverDir
   );
   await spawn(
-    "npm",
+    npmCmd,
     [
       "install",
       "-D",
@@ -195,7 +204,7 @@ async function generateClientScaffold(dir: string) {
   await mkdir(path.join(dir, "client"));
   console.log(chalk.green(`Created "client" directory.`));
   await spawn(
-    "npx",
+    npxCmd,
     ["create-react-app", "--template", "typescript", "."],
     clientDir
   );
