@@ -55,7 +55,6 @@ var unlink = util_1.default.promisify(fs_1.default.unlink);
 var rmdir = util_1.default.promisify(rimraf_1.default);
 var spawn = function (command, args, cwd) {
     return new Promise(function (resolve, reject) {
-        command = /^win/.test(process.platform) ? command + ".cmd" : command;
         var cmd = child_process_1.default.spawn(command, args, { cwd: cwd, stdio: "inherit" });
         cmd.on("error", reject);
         cmd.on("close", resolve);
