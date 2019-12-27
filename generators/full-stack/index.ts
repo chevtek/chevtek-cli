@@ -113,7 +113,7 @@ async function generateServerScaffold(dir: string) {
   const packageData = {
     "name": `${path.basename(dir)}-server`,
     "scripts": {
-      "start": "ts-node-dev --respawn --transpileOnly index.ts",
+      "start": "ts-node-dev --inspect --respawn --transpileOnly index.ts",
       "build": "tsc && npm run build:dependencies cd ./build && npm install",
       "build:dependencies": "node build-dependencies.js"
     }
