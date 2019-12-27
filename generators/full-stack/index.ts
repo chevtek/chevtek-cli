@@ -30,8 +30,14 @@ export default async (dir: string, force: boolean) => {
   const dirExists = await checkDirectoryExists(dir);
   if (dirExists) {
     const files = await readdir(dir);
-    if (!force && files.length > 0 && (files.length > 1 || path.basename(files[0]) !== ".git")) {
-      throw new Error("Target directory is not empty. Supply --force to generate anyway.");
+    if (
+      !force &&
+      files.length > 0 &&
+      (files.length > 1 || path.basename(files[0]) !== ".git")
+    ) {
+      throw new Error(
+        "Target directory is not empty. Supply --force to generate anyway."
+      );
     }
   } else {
     await mkdir(dir);
@@ -62,12 +68,18 @@ async function initializeGit(dir: string) {
   try {
     const exitCode = await spawn("git", ["status"], dir);
     if (exitCode !== 128) {
-      console.log(chalk.greenBright("Parent git repository found, skipping repo init."));
+      console.log(
+        chalk.greenBright("Parent git repository found, skipping repo init.")
+      );
       return;
     }
     await spawn("git", ["init"], dir);
     await spawn("git", ["add", "."], dir);
-    await spawn("git", ["commit", "-m", `"Initialized full-stack project."`], dir);
+    await spawn(
+      "git",
+      ["commit", "-m", `"Initialized full-stack project."`],
+      dir
+    );
     console.log(chalk.greenBright("Initialized Git repository."));
   } catch (err) {
     console.log(chalk.redBright(err.message));
@@ -88,7 +100,8 @@ async function createPackageJson(dir: string) {
       "dev:client": "wait-on tcp:3001 && cd ./client && npm start",
       "build":
         "run-s build:clean build:server && run-p build:client build:dependencies",
-      "build:server": "cd ./server && npm run build && move-cli ./build ../build",
+      "build:server":
+        "cd ./server && npm run build && move-cli ./build ../build",
       "build:client":
         "cd ./client && npm run build && move-cli ./build ../build/client",
       "build:dependencies": "cd ./build && npm install",
@@ -122,11 +135,7 @@ async function generateServerScaffold(dir: string) {
     path.join(serverDir, "package.json"),
     JSON.stringify(packageData, null, 2)
   );
-  await spawn(
-    npmCmd,
-    ["install", "dotenv", "koa", "mongoose", "koa-static"],
-    serverDir
-  );
+  await spawn(npmCmd, ["install", "dotenv", "koa", "koa-static"], serverDir);
   await spawn(
     npmCmd,
     [
@@ -136,8 +145,7 @@ async function generateServerScaffold(dir: string) {
       "ts-node-dev",
       "@types/node",
       "@types/koa",
-      "@types/koa-static",
-      "@types/mongoose"
+      "@types/koa-static"
     ],
     serverDir
   );
